@@ -18,47 +18,43 @@ namespace CompanyEmployees.Controllers
     {
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManger;
-        private readonly IAuthenticationManager _authenticationManager;
 
-        public AuthenticationController (ILoggerManager logger, IMapper mapper , UserManager<User> userManager, IAuthenticationManager authenticationManager)
+        public AuthenticationController (ILoggerManager logger, IMapper mapper)
         {
             _logger = logger;
             _mapper = mapper;
-            _userManger = userManager;
-            _authenticationManager = authenticationManager;
         }
 
-        [HttpPost]
-        [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
-        {
-            var user = _mapper.Map<User>(userForRegistration);
-            var result = await _userManger.CreateAsync(user, userForRegistration.Password);
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.TryAddModelError(error.Code, error.Description);
-                }
+        //[HttpPost]
+        //[ServiceFilter(typeof(ValidationFilterAttribute))]
+        //public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
+        //{
+        //    var user = _mapper.Map<User>(userForRegistration);
+            
+        //    if (!result.Succeeded)
+        //    {
+        //        foreach (var error in result.Errors)
+        //        {
+        //            ModelState.TryAddModelError(error.Code, error.Description);
+        //        }
 
-                return BadRequest(ModelState);
-            }
+        //        return BadRequest(ModelState);
+        //    }
 
-            await _userManger.AddToRolesAsync(user, userForRegistration.Roles);
-            return StatusCode(201);
-        }
+           
+        //    return StatusCode(201);
+        //}
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
-        {
-            if (!await _authenticationManager.ValidateUser(user))
-            {
-                _logger.LogWarn($"{nameof(Authenticate)}: Authentication failed. Wrong user name or password");
-                return Unauthorized();
-            }
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
+        //{
+        //    if (!await _authenticationManager.ValidateUser(user))
+        //    {
+        //        _logger.LogWarn($"{nameof(Authenticate)}: Authentication failed. Wrong user name or password");
+        //        return Unauthorized();
+        //    }
 
-            return Ok(new { Token = await _authenticationManager.CreateToken() });
-        }
+        //    return Ok(new { Token = await _authenticationManager.CreateToken() });
+        //}
     }
 }
